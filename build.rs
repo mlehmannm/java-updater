@@ -1,7 +1,5 @@
 //! Build script.
 
-#[cfg(windows)]
-use std::env;
 use std::error::Error;
 #[cfg(windows)]
 use std::fs;
@@ -41,7 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // fetch some version information
     let mut emitter = Emitter::default();
     // Allow sandboxed development builds to use fallback values, but keep release and install builds strict.
-    if env::var("PROFILE").as_deref() != Ok("release") {
+    if std::env::var("PROFILE").as_deref() != Ok("release") {
         emitter.default_on_error();
     }
     emitter
@@ -172,7 +170,7 @@ fn find_convert_reg() -> Result<Command, Box<dyn Error>> {
 
 #[cfg(windows)]
 fn find_convert_env() -> Result<Command, Box<dyn Error>> {
-    let home = env::var(ENV_MAGICK_HOME)?;
+    let home = std::env::var(ENV_MAGICK_HOME)?;
 
     // check for convert
     let convert = PathBuf::from(&home).join(CONVERT_EXE);
