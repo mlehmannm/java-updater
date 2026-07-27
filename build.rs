@@ -39,7 +39,12 @@ const MAGICK_EXE: &str = "magick.exe";
 // Main entry point for the build script.
 fn main() -> Result<(), Box<dyn Error>> {
     // fetch some version information
-    Emitter::default()
+    let mut emitter = Emitter::default();
+    // Allow sandboxed development builds to use fallback values, but keep release and install builds strict.
+    if env::var("PROFILE").as_deref() != Ok("release") {
+        emitter.default_on_error();
+    }
+    emitter
         .add_instructions(&Build::all_build())?
         .add_instructions(&Git2::all().dirty(false).sha(true).build())?
         .add_instructions(&Rustc::all_rustc())?

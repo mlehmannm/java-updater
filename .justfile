@@ -15,7 +15,6 @@ set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 # select toolchain [e.g.: just CHANNEL=<channel> recipe args]
 
 CHANNEL := ''
-
 #CHANNEL := '+stable'
 #CHANNEL := '+nightly'
 #CHANNEL := '+1.84'
@@ -101,28 +100,6 @@ fmt *ARGS='':
 release VERSION='--help':
     cargo {{ CHANNEL }} release {{ VERSION }} --execute
 
-# start a new feature branch (use feature/XYZ as BRANCH)
-start-branch BRANCH:
-    git switch --create "{{ BRANCH }}"
-
-# update the current feature branch from main
-update-branch:
-    @if ((git branch --show-current) -eq "main") { throw "Refusing to rebase main" }
-    git fetch origin main
-    git rebase origin/main
-
-# finish an existing feature branch
-finish-branch BRANCH MESSAGE:
-    git checkout main
-    git checkout -b "{{ BRANCH }}-finish"
-    git merge --squash "{{ BRANCH }}" --no-log
-    git commit --message "{{ MESSAGE }}"
-    git checkout main
-    git merge "{{ BRANCH }}-finish"
-    git branch --delete "{{ BRANCH }}"
-    git branch --delete "{{ BRANCH }}-finish"
-    git push origin --delete "{{ BRANCH }}"
-
 # create the icon from svg via imagemagick (docker)
 ico:
     docker run --rm -v {{ invocation_directory() }}:/app -w /app minidocks/imagemagick convert -density 256x256 -background transparent res/svg/exe.svg -define icon:auto-resize=256,64,48,40,32,24,20,16 -compress none res/exe.ico
@@ -133,8 +110,9 @@ act-release MATRIX='build:linux-64-bit':
     act -W ./.github/workflows/release.yml --matrix {{ MATRIX }} --bind --env ARTIFACT_DIR=target --env GITHUB_REF=refs/tags/nektos.act
 
 # check for outdated dependencies / upgrade dependencies / update dependencies
+[env('RUST_LOG', 'warn')]
 update-deps:
-    cargo outdated --verbose
+    -cargo outdated --verbose
     cargo upgrade --recursive true --verbose
     cargo update --recursive --verbose
 
