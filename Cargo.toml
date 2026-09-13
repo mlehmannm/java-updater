@@ -64,7 +64,7 @@ zip = "8"
 vergen-git2 = { version = "10", features = ["build", "emit_and_set", "rustc"] }
 
 [target.'cfg(windows)'.build-dependencies]
-windows-registry = "0.6"
+windows-registry = "0.100"
 winresource = "0.1"
 
 [dev-dependencies]

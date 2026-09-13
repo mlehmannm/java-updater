@@ -109,12 +109,11 @@ ico:
 act-release MATRIX='build:linux-64-bit':
     act -W ./.github/workflows/release.yml --matrix {{ MATRIX }} --bind --env ARTIFACT_DIR=target --env GITHUB_REF=refs/tags/nektos.act
 
-# check for outdated dependencies / upgrade dependencies / update dependencies
+# update all dependencies without crossing compatibility boundaries
 [env('RUST_LOG', 'warn')]
 update-deps:
-    -cargo outdated --verbose
-    cargo upgrade --recursive true --verbose
-    cargo update --recursive --verbose
+    cargo upgrade --compatible allow --incompatible ignore --pinned ignore --recursive false --verbose
+    cargo update --verbose
 
 # install prerequisites (unix)
 [unix]
